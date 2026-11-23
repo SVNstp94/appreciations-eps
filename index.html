@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#c4412a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Appréciations EPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday work tool for a PE teacher at report-card time
+   IDEA the athletics track: the character limit is a lane with a finish line
+   PICTURE the live appreciation card, its lane counter filling toward 255
+   COLOUR white ground, ink, tartan red (trimester, track), court blue (qualities), amber (vigilance)
+   TYPE Barlow Condensed 700 + Barlow
+   LAYOUT laptop: roster left, sticky card over the button groups; phone: roster strip, card, groups */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#111315);--ink:light-dark(#15171a,#ececec);--mute:light-dark(#5b6067,#a3a8af);--line:light-dark(#dde0e4,#2d3136);--panel:light-dark(#f3f4f5,#1b1e22);--tartan:light-dark(#c4412a,#ef6d55);--lane:light-dark(#f5dbd4,#3b211c);--blue:light-dark(#1f45c9,#8ca6ff);--amber:light-dark(#995600,#f3ab4c);--on:light-dark(#ffffff,#111315)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif;overflow-x:clip}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;padding:18px max(4vw,16px) 14px;border-top:6px solid var(--tartan)}
+h1{font:700 clamp(32px,4vw,44px)/1.05 'Barlow Condensed',Barlow,sans-serif;letter-spacing:-.01em;margin:0}
+.sub{margin:2px 0 0;color:var(--mute)}
+.bar{display:flex;gap:8px;flex-wrap:wrap}
+select,.btn{min-height:44px;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 14px;cursor:pointer}
+select{min-width:7em}
+.btn:hover,select:hover{border-color:var(--ink)}
+.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{min-height:36px;padding:4px 10px;font-size:14px}
+.note{margin:0;padding:8px max(4vw,16px);font-size:14px;color:var(--mute);background:var(--panel)}
+.settings{background:var(--panel);padding:20px max(4vw,16px) 24px;border-block:1.5px solid var(--line)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px 24px;max-width:1240px}
+.f{display:flex;flex-direction:column;gap:6px}
+.f.wide{grid-column:1/-1}
+.f label,.f summary{font-weight:600}
+.f small{color:var(--mute);font-size:14px}
+.f .btn{align-self:start}
+input,textarea{font-size:16px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.app{display:grid;grid-template-columns:minmax(0,1fr);gap:0 32px;padding:0 max(4vw,16px) 56px}
+.rhead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 0 8px;flex-wrap:wrap}
+.rhead strong{font-size:15px}
+.rhead .w{color:var(--amber)}
+#list{list-style:none;margin:0;padding:0}
+.ri{display:grid;grid-template-columns:1.8em minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;min-height:44px;padding:6px 10px;border:0;background:none;text-align:left;border-radius:8px;cursor:pointer}
+.ri:hover{background:var(--panel)}
+.ri[aria-current=true]{background:var(--panel);font-weight:600;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.num{color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums}
+.nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st{font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--mute)}
+.st.w{color:var(--amber);font-weight:600}
+.card{position:sticky;top:0;z-index:3;background:var(--bg);padding:14px 0 14px;border-bottom:1.5px solid var(--line)}
+.who{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.name{flex:1;display:flex;align-items:baseline;gap:10px;min-width:0}
+.name strong{font:700 30px/1.1 'Barlow Condensed',Barlow,sans-serif;overflow-wrap:anywhere}
+#pos{color:var(--mute);font-size:14px;white-space:nowrap}
+.nav{width:44px;height:44px;border:1.5px solid var(--line);border-radius:50%;background:var(--bg);font-size:22px;line-height:1;cursor:pointer}
+.nav:disabled{opacity:.35;cursor:default}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{min-height:42px;min-width:60px;border:0;background:none;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg);font-weight:600}
+.seg.need{border-color:var(--amber);box-shadow:0 0 0 3px color-mix(in srgb,var(--amber) 30%,transparent)}
+#txt{display:block;width:100%;margin-top:12px;font-size:17px;line-height:1.5;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--panel);resize:none;min-height:4.6em;overflow:hidden}
+.meter{display:flex;align-items:center;gap:16px;margin-top:12px}
+.count{white-space:nowrap}
+.count b{font:700 46px/1 'Barlow Condensed',Barlow,sans-serif;font-variant-numeric:tabular-nums}
+.count span{color:var(--mute);margin-left:4px}
+.lane{position:relative;flex:1;height:20px;background:var(--lane);border-radius:4px}
+.lane::after{content:'';position:absolute;left:0;right:0;top:50%;border-top:1.5px dashed color-mix(in srgb,var(--bg) 80%,transparent)}
+#fill,#over{position:absolute;top:0;bottom:0;left:0;border-radius:4px 0 0 4px;background:var(--tartan);transition:width .25s ease}
+#over{border-radius:0 4px 4px 0;background:repeating-linear-gradient(135deg,var(--amber) 0 6px,color-mix(in srgb,var(--amber) 60%,var(--bg)) 6px 12px)}
+#finish{position:absolute;top:-7px;bottom:-7px;width:10px;transform:translateX(-50%);background:repeating-conic-gradient(var(--ink) 0 25%,var(--bg) 0 50%) 0 0/10px 10px;border:1px solid var(--ink);z-index:1}
+.isover .count b{color:var(--amber)}
+.msg{min-height:1.5em;margin:10px 0 0;font-size:15px;color:var(--mute)}
+.msg.w{color:var(--amber);font-weight:600}
+.link{border:0;background:none;color:var(--blue);text-decoration:underline;cursor:pointer;padding:0;font:inherit}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hint{color:var(--mute);font-size:14px;margin:14px 0 0}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:0 32px}
+.grp{padding:16px 0 10px;border-top:1px solid var(--line)}
+.grp h2{font:700 22px/1.1 'Barlow Condensed',Barlow,sans-serif;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.grp h2::before{content:'';flex:none;width:12px;height:12px;border-radius:3px;background:var(--c)}
+.grp h2 small{font:500 14px Barlow,sans-serif;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:8px 14px;border:1.5px solid var(--line);border-radius:22px;background:var(--bg);cursor:pointer;line-height:1.25;text-align:left}
+.chip:hover{border-color:var(--c)}
+.chip[aria-pressed=true]{background:var(--c);border-color:var(--c);color:var(--on);font-weight:600}
+.chip.full{opacity:.45}
+.chip:disabled{opacity:.3;cursor:not-allowed}
+.gc{display:inline-flex;align-items:stretch;border-radius:22px;background:var(--c);color:var(--on)}
+.gc .chip,.gc .chip[aria-pressed=true]{border-color:transparent;background:transparent;color:var(--on);padding:4px 4px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;text-align:center}
+.lv{min-width:38px;min-height:44px;border:0;border-radius:22px;background:transparent;color:var(--on);font-size:20px;font-weight:600;line-height:1;cursor:pointer}
+.lv:hover:not(:disabled){background:color-mix(in srgb,var(--on) 20%,transparent)}
+.lv:disabled{opacity:.35;cursor:default}
+.dots{font-size:9px;letter-spacing:2px;font-weight:400;opacity:.9;margin-top:2px}
+.sep{align-self:center;color:var(--mute);font-size:14px;padding:0 2px}
+.empty{margin:0;color:var(--mute);font-size:15px}
+.blank{padding:40px 0;color:var(--mute)}
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px);z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.pn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.pn label{font-size:14px;color:var(--mute)}
+.pn input{padding:6px 10px;min-height:40px;width:14em}
+.pick{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px;font-size:14px;color:var(--mute)}
+.pick .chip{min-height:36px;padding:4px 12px;font-size:14px}
+@media(min-width:900px){.app{grid-template-columns:250px minmax(0,1fr)}.roster{position:sticky;top:0;align-self:start;max-height:100dvh;overflow:auto;padding-bottom:16px}}
+@media(max-width:899px){#list{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}#list li{flex:none}.ri{width:auto;border:1.5px solid var(--line);grid-template-columns:auto auto auto}.nm{max-width:11em}}
+@media(max-width:600px){.who{flex-wrap:nowrap;gap:6px}.name strong{font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pos,.lg{display:none}.seg button{min-width:48px}#txt{font-size:16px;margin-top:8px}.count b{font-size:36px}.card{padding:8px 0 10px}.acts{flex-wrap:nowrap}.acts .btn{padding:8px 11px}.msg{font-size:14px;margin-top:6px}}
+@media(prefers-reduced-motion:reduce){#fill,#over,#toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><h1>Appréciations EPS</h1><p class="sub" id="sub"></p></div>
+  <div class="bar">
+    <label class="sr" for="clsSel">Classe</label>
+    <select id="clsSel"></select>
+    <button class="btn" id="newCls">+ Classe</button>
+    <button class="btn" id="setBtn" aria-expanded="false" aria-controls="settings">Réglages</button>
+  </div>
+</header>
+<section class="settings" id="settings" hidden>
+  <div class="sgrid">
+    <div class="f"><label for="fName">Nom de la classe</label><input id="fName" autocomplete="off"></div>
+    <div class="f"><label for="fActs">Activités du trimestre, une par ligne</label><textarea id="fActs" rows="3"></textarea><small>Sans précision, le texte dit « dans l'activité » ou « dans les activités ».</small></div>
+    <div class="f"><label for="fLimit">Limite de caractères</label><input id="fLimit" type="number" min="60" max="2000" inputmode="numeric"><small>Vaut pour toutes les classes.</small></div>
+    <div class="f wide"><label for="fStu">Élèves, un par ligne</label><textarea id="fStu" rows="8" placeholder="DUPONT Léa (Mme)&#10;MARTIN Hugo (M.)"></textarea><small>Format Pronote accepté : NOM Prénom (M.) ou (Mme). Tu peux aussi finir la ligne par F ou G. Un élève retiré de la liste perd son appréciation.</small><button class="btn pri" id="applyStu">Mettre à jour la liste</button></div>
+    <details class="f wide"><summary>Sauvegarde</summary>
+      <p>Les appréciations restent dans ce navigateur. Pour changer d'appareil ou garder une copie, copie la sauvegarde et colle-la ici sur l'autre appareil.</p>
+      <button class="btn" id="bkCopy">Copier la sauvegarde</button>
+      <textarea id="bkIn" rows="3" placeholder="Colle une sauvegarde ici"></textarea>
+      <button class="btn" id="bkLoad">Restaurer cette sauvegarde</button>
+      <div class="presets" id="bkFiles" hidden><button class="btn" id="bkSave">Enregistrer la sauvegarde (fichier)</button><label class="btn" for="bkFile">Importer un fichier de sauvegarde</label><input id="bkFile" type="file" accept=".json,application/json" class="sr"></div>
+    </details>
+    <div class="f wide"><button class="btn" id="delCls">Supprimer cette classe</button></div>
+  </div>
+</section>
+<main class="app">
+  <aside class="roster" aria-label="Élèves">
+    <div class="rhead"><strong id="sum"></strong><button class="btn sm" id="copyAll">Tout copier</button></div>
+    <ol id="list"></ol>
+  </aside>
+  <section class="work">
+    <div class="card" id="card">
+      <div class="who">
+        <button class="nav" id="prev" aria-label="Élève précédent">‹</button>
+        <div class="name"><strong id="sname"></strong><span id="pos"></span></div>
+        <div class="seg" id="seg" role="group" aria-label="Accords"><button id="gM" aria-pressed="false">Il</button><button id="gF" aria-pressed="false">Elle</button></div>
+        <button class="nav" id="next" aria-label="Élève suivant">›</button>
+      </div>
+      <label class="sr" for="txt">Appréciation</label>
+      <textarea id="txt" rows="4" spellcheck="true"></textarea>
+      <div class="meter">
+        <div class="count"><b id="n">0</b><span id="lim">/ 255</span></div>
+        <div class="lane" aria-hidden="true"><i id="fill"></i><i id="over"></i><s id="finish"></s></div>
+      </div>
+      <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="acts">
+        <button class="btn" id="alt">↻ Autre<span class="lg"> formulation</span></button>
+        <button class="btn" id="copy">Copier</button>
+        <button class="btn pri" id="copyNext">Copier et <span class="lg">passer au </span>suivant</button>
+      </div>
+    </div>
+    <p class="blank" id="blank" hidden>Cette classe n'a pas encore d'élèves. <button class="link" data-act="settings">Ouvrir les réglages</button> pour coller la liste ou importer une sauvegarde.</p>
+    <p class="hint" id="hint">Un mot choisi se nuance avec − et +. Repère : trimestre + 2 qualités + 2 autres choix + 1 conseil tiennent presque toujours en 255 caractères.</p>
+    <div class="groups" id="groups"></div>
+  </section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+{
+// Gendered words are written {masculin|féminin}. Graded items list their levels from the least to the most.
+const ADJ = (k, x, flat) => ({k, d:flat ? 0 : 1, lv:flat ? [{l:x, t:x}] : [{l:'assez ' + x, t:'assez ' + x}, {l:x, t:x}, {l:'très ' + x, t:'très ' + x}]});
+const ONE = (k, l, t, extra) => Object.assign({k, d:0, lv:[{l, t}]}, extra || {});
+
+const BANK = {
+  nature: [
+    {k:'exc', l:'Excellent', v:[['Excellent trimestre.',0],["C'est un excellent trimestre.",1],['Le trimestre est excellent.',1]]},
+    {k:'tb', l:'Très bon', v:[['Très bon trimestre.',0],["C'est un très bon trimestre.",1],['Un très bon trimestre.',1]]},
+    {k:'bon', l:'Bon', v:[['Bon trimestre.',0],["C'est un bon trimestre.",1],['Le trimestre est bon.',1]]},
+    {k:'sat', l:'Satisfaisant', v:[['Trimestre satisfaisant.',0],["C'est un trimestre satisfaisant.",1],['Le trimestre est satisfaisant.',1]]},
+    {k:'enc', l:'Encourageant', v:[['Trimestre encourageant.',0],["C'est un trimestre encourageant.",1],['Le trimestre est encourageant.',1]]},
+    {k:'cor', l:'Correct', v:[['Trimestre correct.',0],["C'est un trimestre correct.",1],['Le trimestre est correct.',1]]},
+    {k:'dt', l:'En demi-teinte', v:[['Trimestre en demi-teinte.',0],["C'est un trimestre en demi-teinte.",1],['Le trimestre est en demi-teinte.',1]]},
+    {k:'dec', l:'Décevant', v:[['Trimestre décevant.',0],["C'est un trimestre décevant.",1],['Le trimestre est décevant.',1]]},
+    {k:'fra', l:'Fragile', v:[['Trimestre fragile.',0],['Ce trimestre est fragile.',1],["C'est un trimestre fragile.",1]]},
+    {k:'ins', l:'Insuffisant', v:[['Trimestre insuffisant.',0],["C'est un trimestre insuffisant.",1],['Le trimestre est insuffisant.',1]]},
+    {k:'disp', l:'{Dispensé|Dispensée}', disp:1},
+    {k:'nev', l:'{Non évalué|Non évaluée}', solo:1, v:[["Le trimestre ne peut être évalué : {P} a été absent{e} sur l'ensemble de la période.",0],["Pas d'éléments d'évaluation sur ce trimestre.",0],["{P} n'a pas pu être évalué{e} ce trimestre.",0]]}
+  ],
+  qual: [
+    {k:'elem', head:1, d:1, lv:[{l:'bon élément', t:'un bon élément'}, {l:'très bon élément', t:'un très bon élément'}, {l:'excellent élément', t:'un excellent élément'}]},
+    ADJ('ser', '{sérieux|sérieuse}'), ADJ('agr', 'agréable'), ADJ('inv', '{investi|investie}'), ADJ('mot', '{motivé|motivée}'),
+    ADJ('vol', 'volontaire'), ADJ('dyn', 'dynamique'), ADJ('app', '{appliqué|appliquée}'), ADJ('imp', '{impliqué|impliquée}'),
+    ADJ('reg', '{régulier|régulière}'), ADJ('mer', '{méritant|méritante}'), ADJ('act', '{actif|active}'), ADJ('att', '{attentif|attentive}'),
+    ADJ('aut', 'autonome'), ADJ('per', '{persévérant|persévérante}'), ADJ('cur', '{curieux|curieuse}'), ADJ('cou', '{courageux|courageuse}'),
+    ADJ('res', '{respectueux|respectueuse}'), ADJ('sol', 'solidaire'), ADJ('ent', 'enthousiaste'), ADJ('cons', '{consciencieux|consciencieuse}'),
+    ADJ('rig', '{rigoureux|rigoureuse}'), ADJ('cal', 'calme'), ADJ('mat', 'mature'), ADJ('det', '{déterminé|déterminée}'),
+    ADJ('cmb', '{combatif|combative}'), ADJ('pol', '{poli|polie}'), ADJ('exm', 'exemplaire', 1)
+  ],
+  fort: [
+    {k:'par', d:2, lv:[{l:'participe régulièrement', t:'participe régulièrement'}, {l:'participe à chaque leçon', t:'participe à chaque leçon'}, {l:'participe activement', t:'participe activement à chaque leçon'}]},
+    {k:'mot', d:1, lv:[{l:'peut être moteur', t:'peut être moteur pour le groupe'}, {l:'moteur pour la classe', t:'joue un rôle moteur pour la classe'}]},
+    {k:'rol', d:1, l:'rôles sociaux', lv:[{l:'rôles sociaux', t:"s'investit dans les rôles sociaux"}, {l:'pleinement dans les rôles sociaux', t:"s'investit pleinement dans les rôles sociaux"}]},
+    {k:'com', d:1, lv:[{l:'bon comportement', t:'a un bon comportement'}, {l:'comportement irréprochable', t:'a un comportement irréprochable'}]},
+    {k:'esp', d:0, lv:[{l:"bon état d'esprit", t:"fait preuve d'un bon état d'esprit"}, {l:"excellent état d'esprit", t:"fait preuve d'un excellent état d'esprit"}]},
+    {k:'eff', d:1, lv:[{l:'fournit des efforts', t:'fournit des efforts'}, {l:'ne ménage pas ses efforts', t:'ne ménage pas ses efforts'}]},
+    ONE('gou', 'appétence pour le sport', 'montre une réelle appétence pour le sport'),
+    ONE('ref', 'pratique réfléchie', 'développe une pratique réfléchie'),
+    ONE('cons', 'aide à comprendre les consignes', 'aide à la bonne compréhension des consignes'),
+    ONE('dyn', 'bonne dynamique du groupe', 'participe à la bonne dynamique du groupe'),
+    ONE('per', 'interventions pertinentes', 'a des interventions pertinentes'),
+    ONE('aid', 'aide ses camarades', 'aide volontiers ses camarades'),
+    ONE('fair', 'fair-play', 'fait preuve de fair-play'),
+    ONE('regl', 'respecte les règles', 'respecte les règles et les autres'),
+    ONE('ecou', 'écoute les consignes', 'écoute attentivement les consignes'),
+    ONE('grp', 'travaille bien en groupe', 'sait travailler en groupe'),
+    ONE('csl', 'accepte les conseils', 'accepte les conseils pour progresser'),
+    ONE('pers', 'persévère', 'persévère face à la difficulté'),
+    ONE('init', 'prend des initiatives', 'prend des initiatives'),
+    ONE('auto', "fait preuve d'autonomie", "fait preuve d'autonomie"),
+    ONE('ten', 'toujours en tenue', 'vient toujours en tenue'),
+    ONE('ass', '{présent|présente} à chaque cours', 'est {présent|présente} à chaque cours'),
+    ONE('rem', 'sait se remettre en question', 'sait se remettre en question')
+  ],
+  act: [
+    {k:'eng', d:3, lv:[
+      {l:"manque d'engagement", t:["{Il} a manqué d'engagement {dans}.", "L'engagement {dans} a été insuffisant."], pos:0},
+      {l:'engagement inégal', t:['Son engagement {dans} a été inégal.', "{Il} s'est {engagé|engagée} de façon inégale {dans}."], pos:0},
+      {l:'bon engagement', t:["{Il} s'est bien {engagé|engagée} {dans}.", 'Son engagement {dans} a été bon.'], pos:1},
+      {l:'engagement remarquable', t:['Son engagement {dans} a été remarquable.', "{Il} s'est pleinement {engagé|engagée} {dans}."], pos:1}]},
+    {k:'perf', d:3, lv:[
+      {l:'en difficulté', t:['{Il} rencontre des difficultés {dans}.', 'Des difficultés persistent {dans}.'], pos:0},
+      {l:"moins à l'aise", t:["{Il} a été moins à l'aise {dans}.", "{Il} manque encore d'aisance {dans}."], pos:0},
+      {l:"à l'aise", t:["{Il} est à l'aise {dans}.", "{Il} montre de l'aisance {dans}."], pos:1},
+      {l:"très à l'aise", t:['{Il} réalise de très bonnes performances {dans}.', 'Ses performances {dans} sont très bonnes.'], pos:1}]},
+    {k:'prog', d:2, lv:[
+      {l:'peu de progrès', t:['Les progrès {dans} restent limités.', '{Il} a peu progressé {dans}.'], pos:0},
+      {l:'progrès timides', t:['Les progrès {dans} restent timides.', '{Il} a timidement progressé {dans}.'], pos:0},
+      {l:'progrès', t:['{Il} a progressé {dans}.', 'Des progrès sont visibles {dans}.'], pos:1},
+      {l:'nets progrès', t:['{Il} a nettement progressé {dans}.', 'De nets progrès sont visibles {dans}.'], pos:1}]},
+    {k:'mal', d:1, lv:[
+      {l:'malgré de réelles difficultés', t:['Malgré de réelles difficultés {dans}, {il} fait preuve de volonté.', 'Malgré de réelles difficultés {dans}, {il} ne renonce pas.'], pos:1},
+      {l:'malgré quelques difficultés', t:['Malgré quelques difficultés {dans}, {il} fait preuve de volonté.', 'Malgré quelques difficultés {dans}, {il} ne renonce pas.'], pos:1}]},
+    {k:'acc', d:0, lv:[{l:"moins d'accroche", t:["{Il} a montré moins d'accroche {dans}.", '{Il} a été moins {motivé|motivée} {dans}.'], pos:0}]},
+    {k:'sel', d:0, lv:[{l:'motivé selon les activités', lf:'motivée selon les activités', t:['{Il} est {motivé|motivée} selon les activités.', 'Sa motivation varie selon les activités.'], pos:0}]},
+    {k:'rev', d:0, lv:[{l:'{révélé|révélée} en fin de trimestre', t:['{Il} {s\'est révélé|s\'est révélée} en fin de trimestre.', 'La fin de trimestre a été plus convaincante.'], pos:1}]}
+  ],
+  vig: [
+    {k:'ser', d:1, lv:[{l:'parfois peu {sérieux|sérieuse}', t:'manque parfois de sérieux'}, {l:'manque de sérieux', t:'doit gagner en sérieux'}, {l:'vraiment peu {sérieux|sérieuse}', t:'manque nettement de sérieux'}]},
+    {k:'con', d:0, lv:[{l:'parfois {déconcentré|déconcentrée}', t:'manque parfois de concentration'}, {l:'manque de concentration', t:'manque de concentration'}, {l:'souvent {déconcentré|déconcentrée}', t:'manque souvent de concentration'}]},
+    {k:'bav', d:1, lv:[{l:'bavarde parfois', t:'bavarde parfois'}, {l:'bavarde trop', t:'bavarde trop'}, {l:'bavarde beaucoup trop', t:'bavarde beaucoup trop'}]},
+    {k:'can', d:1, lv:[{l:'énergie à canaliser', t:'doit parfois canaliser son énergie'}, {l:'énergie à canaliser', t:'doit canaliser son énergie'}, {l:'énergie à canaliser', t:'doit impérativement canaliser son énergie'}]},
+    {k:'dis', d:1, lv:[{l:'un peu {discret|discrète}', t:'reste un peu {discret|discrète}'}, {l:'trop {discret|discrète}', t:'reste trop {discret|discrète}'}, {l:'beaucoup trop {discret|discrète}', t:'reste beaucoup trop {discret|discrète}'}]},
+    {k:'ret', d:1, lv:[{l:'parfois en retrait', t:'se place parfois en retrait de la pratique'}, {l:'souvent en retrait', t:'se place souvent en retrait de la pratique'}, {l:'constamment en retrait', t:'reste constamment en retrait de la pratique'}]},
+    {k:'irr', d:1, lv:[{l:'parfois irrégulier', lf:'parfois irrégulière', t:"s'investit parfois en dents de scie"}, {l:'en dents de scie', t:"s'investit en dents de scie"}, {l:'très irrégulier', lf:'très irrégulière', t:"s'investit de façon très irrégulière"}]},
+    {k:'min', d:1, lv:[{l:'parfois le minimum', t:'a parfois tendance à faire le minimum'}, {l:'fait le minimum', t:'a tendance à faire le minimum'}, {l:'strict minimum', t:'se contente du strict minimum'}]},
+    {k:'dist', d:1, lv:[{l:'distrait parfois le groupe', t:'distrait parfois le groupe'}, {l:'distrait le groupe', t:'tend à distraire le groupe'}, {l:'perturbe le groupe', t:'perturbe souvent le groupe'}]},
+    {k:'ecc', d:1, lv:[{l:'écoute des consignes', t:'doit être un peu plus {attentif|attentive} aux consignes'}, {l:'écoute des consignes', t:'doit être plus {attentif|attentive} aux consignes'}, {l:'écoute des consignes', t:"n'écoute pas assez les consignes"}]},
+    {k:'rel', d:1, lv:[{l:'relations parfois tendues', t:'a parfois des relations tendues avec ses camarades'}, {l:'relations conflictuelles', t:'a des relations parfois conflictuelles avec ses camarades'}, {l:'souvent en conflit', t:'a des relations souvent conflictuelles avec ses camarades'}]},
+    {k:'aut', d:1, lv:[{l:"parfois peu autonome", t:"manque parfois d'autonomie"}, {l:"manque d'autonomie", t:"manque d'autonomie"}, {l:"très peu autonome", t:"manque beaucoup d'autonomie"}]},
+    {k:'rig', d:1, lv:[{l:'manque parfois de rigueur', t:'manque parfois de rigueur'}, {l:'manque de rigueur', t:'manque de rigueur'}, {l:'vraiment peu rigoureux', lf:'vraiment peu rigoureuse', t:'manque nettement de rigueur'}]},
+    {k:'conf', d:1, lv:[{l:'parfois peu de confiance', t:'manque parfois de confiance en {lui}'}, {l:'manque de confiance', t:'manque de confiance en {lui}'}, {l:'très peu de confiance', t:'manque beaucoup de confiance en {lui}'}]},
+    {k:'dec', d:1, lv:[{l:'se décourage parfois', t:'se décourage parfois face à la difficulté'}, {l:'se décourage vite', t:'se décourage vite'}, {l:'abandonne vite', t:'abandonne trop vite face à la difficulté'}]},
+    {k:'pas', d:1, lv:[{l:'parfois {passif|passive}', t:'reste parfois {passif|passive}'}, {l:'attitude passive', t:'a une attitude trop passive'}, {l:'très {passif|passive}', t:'reste très {passif|passive}'}]},
+    {k:'regl', d:1, lv:[{l:'respect des règles', t:'doit parfois mieux respecter les règles'}, {l:'respect des règles', t:'doit mieux respecter les règles'}, {l:'respect des règles', t:'doit impérativement respecter les règles'}]},
+    {k:'cnt', d:1, lv:[{l:'conteste parfois', t:'conteste parfois les décisions'}, {l:'conteste les décisions', t:'a tendance à contester les décisions'}, {l:'conteste trop souvent', t:'conteste trop souvent les décisions'}]},
+    {k:'abs', d:1, lv:[{l:'quelques absences', t:'a été {absent|absente} à plusieurs reprises'}, {l:'absences', t:'est trop souvent {absent|absente}'}, {l:'très souvent {absent|absente}', t:'est très souvent {absent|absente}'}]},
+    {k:'rtd', d:1, lv:[{l:'parfois en retard', t:'arrive parfois en retard'}, {l:'retards', t:'arrive trop souvent en retard'}, {l:'très souvent en retard', t:'arrive très souvent en retard'}]},
+    {k:'ten', d:1, lv:[{l:'oublie parfois sa tenue', t:'oublie parfois sa tenue'}, {l:'oublis de tenue', t:'oublie trop souvent sa tenue'}, {l:'rarement en tenue', t:'vient rarement en tenue'}]},
+    ONE('dsp', 'dispenses fréquentes', 'est souvent {dispensé|dispensée}'),
+    ONE('grp', 'choix des groupes', 'doit mieux choisir ses groupes de travail')
+  ],
+  cons: [
+    ONE('cont', 'Continuez ainsi', ['Continuez ainsi.', 'Il faut poursuivre dans cette voie.', 'Continuez sur cette lancée.']),
+    ONE('dyn', 'Garder cette dynamique', ['Il faut garder cette dynamique.', 'Gardez cette dynamique.']),
+    ONE('bra', 'Bravo', ['Bravo.', 'Bravo pour cette attitude.', 'Bravo pour ce travail.']),
+    ONE('fel', 'Félicitations', ['Félicitations.', 'Toutes mes félicitations.', 'Félicitations pour ce trimestre.']),
+    ONE('exc', "Viser l'excellence", ["{Il} peut viser l'excellence.", "L'excellence est à portée."]),
+    ONE('att', 'Attitude à conserver', ['Une attitude à conserver.', "C'est une attitude à maintenir.", 'Une attitude positive à conserver.']),
+    ONE('enc', 'Encourageant', ["C'est encourageant pour la suite.", 'Des signes encourageants pour la suite.']),
+    ONE('eff', 'Poursuivre les efforts', ['Continuez ces efforts.', 'Il faut poursuivre ces efforts.', 'Les efforts doivent se poursuivre.']),
+    ONE('reg', 'Gagner en régularité', ['Il faut gagner en régularité.', 'Plus de régularité est attendue.', '{Il} doit gagner en régularité.']),
+    ONE('rig', 'Plus de rigueur', ['Plus de rigueur est attendue.', 'Il faut gagner en rigueur.']),
+    ONE('conc', 'Rester concentré', ['Plus de concentration est attendue.', '{Il} doit rester {concentré|concentrée}.', 'La concentration doit progresser.']),
+    ONE('can', 'Se canaliser', ['Il faut canaliser cette énergie pour progresser.', 'Canalisez votre énergie pour réussir.', '{Il} doit se canaliser pour progresser.']),
+    ONE('conf', 'Prendre confiance', ['{Il} doit prendre confiance en {lui}.', 'Il faut gagner en confiance.', 'Plus de confiance lui permettra de réussir.']),
+    ONE('part', 'Participer davantage', ['{Il} mériterait de participer davantage.', 'Il faut oser participer davantage.', 'Une participation plus active est attendue.']),
+    ONE('aff', "S'affirmer", ["J'attends plus d'affirmation.", "{Il} doit s'affirmer davantage.", "Il faut oser s'affirmer."]),
+    ONE('regl', 'Respecter les règles', ['Le respect des règles est attendu.', 'Les règles de vie doivent être respectées.']),
+    ONE('pot', 'Peut mieux faire', ['Peut mieux faire.', '{Il} a les capacités pour mieux faire.', 'Il faut exploiter ce potentiel.']),
+    ONE('rea', 'Se ressaisir', ["J'attends une réaction et plus d'efforts.", "J'attends un ressaisissement.", 'Il faut se ressaisir rapidement.']),
+    ONE('surs', 'Un sursaut est attendu', ['Un sursaut est attendu.', 'Un net sursaut est attendu au prochain trimestre.']),
+    ONE('comp', 'Je compte sur vous', ['Je compte sur vous pour la suite.', 'Je compte sur vous au prochain trimestre.']),
+    ONE('cour', 'Bon courage', ['Bon courage pour la suite.', "Courage, rien n'est perdu."]),
+    ONE('dom', 'Dommage', ['Dommage.', "C'est dommage."]),
+    ONE('tenu', 'Venir en tenue', ['La tenue de sport est obligatoire à chaque cours.', 'Une tenue adaptée est exigée à chaque séance.']),
+    ONE('jus', 'Justificatifs', ['Il faudra présenter les justificatifs nécessaires.', 'Il est impératif de revenir en cours.'])
+  ]
+};
+
+const FR = {
+  q: ['{P} est {core}.', '{P} se montre {q}.', '{P} est un{e} élève {q} en EPS.'],
+  qHead: ['{P} est {core}.', '{P} est {head} du groupe{, q}.', '{P} est {head} au sein du groupe{, q}.'],
+  qDisp: ['Bien que dispensé{e} de pratique, {P} reste {core}.', 'Dispensé{e} de pratique, {P} reste {core}.'],
+  disp0: ['{P} a été dispensé{e} de pratique ce trimestre.', 'Dispensé{e} de pratique ce trimestre.'],
+  f: ['{Il} {vp}.', 'En cours, {il} {vp}.', 'Au quotidien, {il} {vp}.'],
+  vigC: ['Toutefois, {il} {vp}.', 'Mais {il} {vp}.', 'Attention, {il} {vp}.'],
+  vigN: ['{Il} {vp}.', 'Attention, {il} {vp}.']
+};
+
+const MAX = {q:3, f:2, act:2, v:2, c:2};
+const STEMS = ['trimestre', 'invest', 'effort', 'régul', 'canalis', 'progr', 'félicit', 'attitude', 'activit', 'énergie', 'engag', 'difficult', 'motiv', 'confiance', 'concentr', 'sérieu', 'rigueur'];
+const list = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' et ' + a[a.length - 1];
+const gender = (s, g) => String(s).replace(/\{([^{}|]*)\|([^{}|]*)\}/g, (m, a, b) => g === 'F' ? b : a);
+const prenomOf = name => {
+  const w = String(name || '').trim().split(/\s+/);
+  const i = w.findIndex(x => x !== x.toUpperCase());
+  return i < 0 ? '' : w.slice(i).join(' ');
+};
+const H = s => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 997, 7);
+const lvIndex = (sel, g, it) => { const i = sel.lv ? sel.lv[g + ':' + it.k] : undefined; return Number.isInteger(i) && i >= 0 && i < it.lv.length ? i : it.d; };
+const levelOf = (sel, g, it) => it.lv[lvIndex(sel, g, it)];
+const labelOf = (it, i, g) => { const L = it.lv[i]; return gender(g === 'F' && L.lf ? L.lf : L.l, g); };
+
+function blocksFor(st, cls) {
+  const g = st.g, sel = st.sel, B = [];
+  const P = (st.p && st.p.trim()) || prenomOf(st.name) || (g === 'F' ? 'Elle' : 'Il');
+  const acts = (cls.acts || []).filter(Boolean);
+  const dans = sel.ac && acts.includes(sel.ac) ? 'en ' + sel.ac : acts.length > 1 ? 'dans les activités' : "dans l'activité";
+  const F = s => gender(s, g)
+    .replace(/\{P\}/g, () => P)
+    .replace(/\{Il\}/g, g === 'F' ? 'Elle' : 'Il')
+    .replace(/\{il\}/g, g === 'F' ? 'elle' : 'il')
+    .replace(/\{lui\}/g, g === 'F' ? 'elle' : 'lui')
+    .replace(/\{e\}/g, g === 'F' ? 'e' : '')
+    .replace(/\{dans\}/g, () => dans);
+  const items = (grp, keys) => (keys || []).map(k => BANK[grp].find(x => x.k === k)).filter(Boolean);
+  const nat = BANK.nature.find(x => x.k === sel.n);
+  const solo = !!(nat && nat.solo), disp = !!(nat && nat.disp);
+  if (nat && nat.v) B.push({key:'n', v:nat.v.map(x => F(x[0])), end:nat.v.map(x => !!x[1])});
+  if (!solo) {
+    const qs = items('qual', sel.q);
+    const hd = qs.filter(x => x.head).pop();
+    const head = hd ? levelOf(sel, 'q', hd).t : '';
+    const adj = list(qs.filter(x => !x.head).map(x => gender(levelOf(sel, 'q', x).t, g)));
+    const core = head ? head + (adj ? ', ' + adj : '') : adj ? 'un{e} élève ' + adj : '';
+    let fr = null;
+    if (disp) fr = core ? FR.qDisp : FR.disp0;
+    else if (head) fr = FR.qHead;
+    else if (adj) fr = FR.q;
+    if (fr) B.push({key:'q', v:fr.map(f => F(f.replace('{core}', () => core).replace('{head}', () => head).replace('{, q}', () => adj ? ', ' + adj : '').replace('{q}', () => adj)))});
+    let pos = !!core;
+    const fs = items('fort', sel.f);
+    if (fs.length) { pos = true; const vp = F(list(fs.map(x => levelOf(sel, 'f', x).t))); B.push({key:'f', v:FR.f.map(f => F(f).replace('{vp}', () => vp))}); }
+    if (!disp) items('act', sel.act).forEach((a, i) => { const L = levelOf(sel, 'act', a); pos = !!L.pos; B.push({key:'a' + a.k, v:L.t.map(t => F(i ? t.replace(/ \{dans\}/g, '') : t))}); });
+    const vs = items('vig', sel.v);
+    if (vs.length) { const vp = F(list(vs.map(x => levelOf(sel, 'v', x).t))); B.push({key:'v', v:(pos ? FR.vigC : FR.vigN).map(f => F(f).replace('{vp}', () => vp))}); }
+  }
+  items('cons', sel.c).forEach(c => B.push({key:'c' + c.k, v:c.lv[0].t.map(F)}));
+  return B;
+}
+
+function order(B, idx) {
+  const parts = B.map((b, i) => ({key:b.key, t:b.v[idx[i]], end:!!(b.end && b.end[idx[i]])}));
+  const n = parts.findIndex(p => p.key === 'n');
+  if (n >= 0 && parts[n].end) {
+    const [p] = parts.splice(n, 1);
+    const c = parts.findIndex(x => x.key[0] === 'c');
+    parts.splice(c < 0 ? parts.length : c, 0, p);
+  }
+  return parts.map(p => p.t);
+}
+
+function compose(st, cls, limit) {
+  if (!st.g) return {text:'', state:'g'};
+  const B = blocksFor(st, cls);
+  if (!B.length) return {text:'', state:'empty'};
+  const w1 = t => t.split(/[ ,']/)[0];
+  const prim = B.map(b => (st.seed + H(b.key)) % b.v.length);
+  const N = B.reduce((p, b) => p * b.v.length, 1);
+  const primLen = order(B, prim).join(' ').length;
+  let best = null, shortest = null;
+  for (let x = 0; x < N; x++) {
+    let y = x;
+    const idx = B.map(b => { const d = y % b.v.length; y = Math.floor(y / b.v.length); return d; });
+    const parts = order(B, idx), t = parts.join(' ');
+    if (!shortest || t.length < shortest.length) shortest = t;
+    if (t.length > limit) continue;
+    let rep = 0;
+    for (let i = 1; i < parts.length; i++) if (w1(parts[i]) === w1(parts[i - 1])) rep++;
+    const low = t.toLowerCase();
+    for (const w of STEMS) { const n = low.split(w).length - 2; if (n > 0) rep += n; }
+    const same = idx.filter((d, i) => d === prim[i]).length;
+    const sc = [-rep, same, t.length];
+    if (!best || sc[0] > best.sc[0] || (sc[0] === best.sc[0] && (sc[1] > best.sc[1] || (sc[1] === best.sc[1] && sc[2] > best.sc[2])))) best = {sc, t};
+  }
+  if (best) return {text:best.t, state:'ok', auto:primLen > limit, N};
+  return {text:shortest, state:'long', N};
+}
+
+function migrateSel(s) {
+  const o = s || {};
+  const arr = v => Array.isArray(v) ? v : (v ? [v] : []);
+  const sel = {n:o.n || null, q:arr(o.q), f:arr(o.f), act:arr(o.act), ac:o.ac || null, v:arr(o.v), c:arr(o.c), lv:(o.lv && typeof o.lv === 'object') ? o.lv : {}};
+  const qi = sel.q.findIndex(k => k === 'tbe' || k === 'exe');
+  if (qi >= 0) { sel.lv['q:elem'] = sel.q[qi] === 'exe' ? 2 : 1; sel.q[qi] = 'elem'; }
+  const di = sel.act.indexOf('dif');
+  if (di >= 0) { sel.act[di] = 'perf'; sel.lv['act:perf'] = 0; }
+  return sel;
+}
+
+if (typeof module !== 'undefined') module.exports = {BANK, FR, MAX, blocksFor, compose, prenomOf, labelOf, lvIndex, gender, migrateSel};
+
+
+const CLASSES = [];
+const PWA = true;
+const ACTS = ["course d'orientation", 'demi-fond'];
+const KEY = 'appreciations-eps-v2';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const newSel = () => ({n:null, q:[], f:[], act:[], ac:null, v:[], c:[], lv:{}});
+const mkStu = (name, g, i) => ({id:uid(), name, g, p:'', sel:newSel(), seed:i, manual:null, copied:false});
+const car = n => n + (n > 1 ? ' caractères' : ' caractère');
+const lines = t => t.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+let state = null, delArm = 0;
+
+function initial() {
+  const src = CLASSES.length ? CLASSES : ['3A', '3B', '3D', '4A', '4C', '4D'].map(name => ({name, stu:[]}));
+  const classes = src.map(c => { const stu = c.stu.map(([n, g], i) => mkStu(n, g, i)); return {id:uid(), name:c.name, acts:[...ACTS], stu, at:stu[0] ? stu[0].id : null}; });
+  return {v:2, limit:255, cur:classes[0].id, classes};
+}
+const valid = d => d && d.v === 2 && Array.isArray(d.classes) && d.classes.length && d.classes.every(c => Array.isArray(c.stu));
+function load() { try { const d = JSON.parse(localStorage.getItem(KEY)); if (valid(d)) return d; } catch (e) {} return null; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+const cls = () => state.classes.find(c => c.id === state.cur) || state.classes[0];
+const cur = () => { const c = cls(); return c.stu.find(s => s.id === c.at) || c.stu[0] || null; };
+
+function statuses(c) {
+  const L = state.limit;
+  const rows = c.stu.map(s => { const r = compose(s, c, L); const t = s.manual != null ? s.manual : r.text; return {s, r, t, len:t.length}; });
+  const cnt = {};
+  rows.forEach(x => { if (x.t) cnt[x.t] = (cnt[x.t] || 0) + 1; });
+  rows.forEach(x => {
+    x.dup = !!x.t && cnt[x.t] > 1;
+    x.st = (!x.s.g && x.s.manual == null) ? 'g' : !x.t.trim() ? 'empty' : x.len > L ? 'long' : x.dup ? 'dup' : 'ok';
+  });
+  return rows;
+}
+
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2200); }
+
+async function copyText(t) {
+  t = t.normalize('NFC');
+  try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+  try { const a = document.createElement('textarea'); a.value = t; a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select(); const ok = document.execCommand('copy'); a.remove(); return ok; } catch (e) { return false; }
+}
+
+function renderTop() {
+  const c = cls();
+  $('clsSel').innerHTML = state.classes.map(k => `<option value="${k.id}"${k.id === c.id ? ' selected' : ''}>${esc(k.name || 'Sans nom')}</option>`).join('');
+  $('sub').textContent = [(c.acts || []).join(' et ') || 'activités non précisées', c.stu.length + (c.stu.length > 1 ? ' élèves' : ' élève')].join(' · ');
+}
+
+function renderRoster(rows) {
+  const s = cur();
+  const lab = x => x.st === 'g' ? ['Il/Elle ?', 1] : x.st === 'empty' ? ['—', 0] : x.st === 'long' ? ['+' + (x.len - state.limit), 1] : x.st === 'dup' ? ['doublon', 1] : [(x.s.copied ? '✓ ' : '') + (x.s.manual != null ? '✎ ' : '') + x.len, 0];
+  $('list').innerHTML = rows.map((x, i) => { const [t, w] = lab(x); return `<li><button class="ri" data-id="${x.s.id}" aria-current="${!!s && x.s.id === s.id}"><span class="num">${i + 1}</span><span class="nm">${esc(x.s.name)}</span><span class="st${w ? ' w' : ''}">${esc(t)}</span></button></li>`; }).join('');
+  const k = st => rows.filter(x => x.st === st).length;
+  const warn = [[k('long'), 'trop longue', 'trop longues'], [k('g'), 'sans Il/Elle', 'sans Il/Elle'], [k('dup'), 'doublon', 'doublons']].filter(w => w[0]).map(w => `${w[0]} ${w[0] > 1 ? w[2] : w[1]}`);
+  const done = rows.filter(x => x.s.copied).length;
+  $('sum').innerHTML = rows.length ? `${k('ok')} / ${rows.length} prêtes${done ? ` · ${done} copiée${done > 1 ? 's' : ''}` : ''}${warn.length ? ` · <span class="w">${warn.join(' · ')}</span>` : ''}` : 'Aucun élève';
+  const on = $('list').querySelector('[aria-current=true]');
+  if (on && s && s.id !== renderRoster.last) {
+    renderRoster.last = s.id;
+    const L = $('list'), R = L.closest('.roster'), lr = L.getBoundingClientRect(), br = on.getBoundingClientRect();
+    if (L.scrollWidth > L.clientWidth + 1) L.scrollLeft += (br.left - lr.left) - (lr.width - br.width) / 2;
+    if (R.scrollHeight > R.clientHeight + 1) { const rr = R.getBoundingClientRect(); if (br.top < rr.top + 60 || br.bottom > rr.bottom) R.scrollTop += br.top - rr.top - rr.height / 2; }
+  }
+}
+
+function renderMeter(len) {
+  const L = state.limit, M = Math.max(L * 1.15, len);
+  $('n').textContent = len;
+  $('lim').textContent = '/ ' + L;
+  $('fill').style.width = Math.min(len, L) / M * 100 + '%';
+  $('over').style.left = L / M * 100 + '%';
+  $('over').style.width = Math.max(0, len - L) / M * 100 + '%';
+  $('finish').style.left = L / M * 100 + '%';
+  $('card').classList.toggle('isover', len > L);
+}
+
+function renderMsg(x, rows) {
+  const m = $('msg'); let h = '', w = false;
+  if (x.s.manual != null) h = 'Texte modifié à la main : les boutons ne le changent plus. <button class="link" data-act="revert">Revenir au texte généré</button>';
+  else if (x.st === 'g') { h = 'Choisis Il ou Elle pour accorder le texte.'; w = true; }
+  else if (x.st === 'empty') h = 'Clique sur les boutons ci-dessous pour composer l\'appréciation.';
+  else if (x.st === 'long') { h = `Trop long de ${car(x.len - state.limit)}, même avec les formulations les plus courtes : retire un élément.`; w = true; }
+  else if (x.st === 'dup') { const o = rows.find(y => y !== x && y.t === x.t); h = `Texte identique à celui de ${esc(o.s.name)} : clique sur Autre formulation.`; w = true; }
+  else if (x.r.auto) h = `Formulation raccourcie automatiquement pour tenir en ${state.limit}.`;
+  else h = x.s.copied ? 'Copiée.' : 'Prête à copier.';
+  if (x.s.manual != null && x.len > state.limit) { h = `Trop long de ${car(x.len - state.limit)}. ` + h; w = true; }
+  m.innerHTML = h; m.classList.toggle('w', w);
+}
+
+function renderCard(rows, keepText) {
+  const c = cls(), s = cur(), has = !!s;
+  $('card').hidden = !has; $('groups').hidden = !has; $('hint').hidden = !has;
+  $('blank').hidden = has;
+  if (!has) return;
+  const i = c.stu.indexOf(s), x = rows[i];
+  $('sname').textContent = s.name;
+  $('pos').textContent = `${i + 1} / ${c.stu.length}`;
+  $('prev').disabled = i === 0; $('next').disabled = i === c.stu.length - 1;
+  $('gM').setAttribute('aria-pressed', s.g === 'M'); $('gF').setAttribute('aria-pressed', s.g === 'F');
+  $('seg').classList.toggle('need', !s.g);
+  const ta = $('txt');
+  if (!keepText) ta.value = x.t;
+  ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 3 + 'px';
+  ta.placeholder = s.g ? 'L\'appréciation s\'écrit ici au fil des clics.' : 'Choisis d\'abord Il ou Elle.';
+  renderMeter(x.len);
+  renderMsg(x, rows);
+  $('alt').disabled = s.manual != null || !x.t || (x.r.N || 1) < 2;
+  $('copy').disabled = $('copyNext').disabled = !x.t.trim();
+}
+
+function chip(g, k, label, on, cl, dis) { return `<button class="chip${cl ? ' ' + cl : ''}" data-g="${g}" data-k="${esc(k)}" aria-pressed="${on}"${dis ? ' disabled' : ''}>${esc(label)}</button>`; }
+function grp(title, hint, color, body, off, pre) { return `<section class="grp${off ? ' off' : ''}" style="--c:var(${color})"><h2>${title} <small>${hint}</small></h2>${pre || ''}<div class="chips">${body}</div></section>`; }
+
+const GRP = {q:'qual', f:'fort', act:'act', v:'vig', c:'cons'};
+function renderGroups() {
+  const c = cls(), s = cur(); if (!s) { $('groups').innerHTML = ''; return; }
+  const sel = s.sel, g = s.g, nat = BANK.nature.find(x => x.k === sel.n);
+  const solo = !!(nat && nat.solo), disp = !!(nat && nat.disp);
+  const item = (grp, it, dis) => {
+    const on = sel[grp].includes(it.k), n = it.lv.length, i = on ? lvIndex(sel, grp, it) : it.d;
+    const lab = !on && it.l ? gender(it.l, g) : labelOf(it, i, g);
+    if (!on || n < 2) return chip(grp, it.k, lab, on, !on && sel[grp].length >= MAX[grp] ? 'full' : '', dis);
+    const dots = it.lv.map((_, j) => j <= i ? '●' : '○').join('');
+    const lv = (d, txt, lbl, off) => `<button class="lv" data-g="${grp}" data-k="${it.k}" data-d="${d}" aria-label="${lbl}"${off || dis ? ' disabled' : ''}>${txt}</button>`;
+    return `<span class="gc">${lv(-1, '−', 'Nuancer vers le moins', i === 0)}<button class="chip" data-g="${grp}" data-k="${esc(it.k)}" aria-pressed="true"${dis ? ' disabled' : ''}>${esc(lab)}<span class="dots" aria-hidden="true">${dots}</span></button>${lv(1, '+', 'Nuancer vers le plus', i === n - 1)}</span>`;
+  };
+  const na = ' · sans objet ici';
+  const nb = BANK.nature.map(x => (x.k === 'disp' ? '<span class="sep">ou</span>' : '') + chip('n', x.k, gender(x.l, g), sel.n === x.k)).join('');
+  const acts = (c.acts || []).filter(Boolean);
+  const pick = acts.length ? `<div class="pick">Nommer l'activité : ${chip('ac', '', 'non', !sel.ac, '', solo || disp)}${acts.map(a => chip('ac', a, a, sel.ac === a, '', solo || disp)).join('')}</div>` : '';
+  const pn = `<div class="pn"><label for="pn">Prénom dans le texte</label><input id="pn" autocomplete="off" value="${esc(s.p || prenomOf(s.name))}"${solo ? ' disabled' : ''}></div>`;
+  $('groups').innerHTML = [
+    grp('Le trimestre', '1 choix', '--tartan', nb),
+    grp('L\'élève', '3 max' + (solo ? na : ''), '--blue', BANK.qual.map(x => item('q', x, solo)).join(''), solo, pn),
+    grp('Points forts', '2 max' + (solo ? na : ''), '--blue', BANK.fort.map(x => item('f', x, solo)).join(''), solo),
+    grp('Dans l\'activité', '2 max' + (solo || disp ? na : ''), '--blue', BANK.act.map(x => item('act', x, solo || disp)).join(''), solo || disp, pick),
+    grp('Point de vigilance', '2 max' + (solo ? na : ''), '--amber', BANK.vig.map(x => item('v', x, solo)).join(''), solo),
+    grp('Conseil, encouragement', '2 max', '--ink', BANK.cons.map(x => item('c', x)).join(''))
+  ].join('');
+}
+
+function render(keepText) {
+  const rows = statuses(cls());
+  renderTop(); renderRoster(rows); renderCard(rows, keepText); renderGroups(); save();
+}
+
+function fillSettings() {
+  const c = cls();
+  $('fName').value = c.name || ''; $('fActs').value = (c.acts || []).join('\n'); $('fLimit').value = state.limit;
+  $('fStu').value = c.stu.map(s => s.name + (s.g ? (s.g === 'F' ? ' (Mme)' : ' (M.)') : '')).join('\n');
+  delArm = 0; $('delCls').textContent = 'Supprimer cette classe';
+}
+function openSettings(open) {
+  const p = $('settings'); if (open === undefined) open = p.hidden;
+  p.hidden = !open; $('setBtn').setAttribute('aria-expanded', open);
+  if (open) { fillSettings(); p.scrollIntoView({block:'start'}); }
+}
+function parseList(t) {
+  return lines(t).map(l => l.replace(/[;\t,]+/g, ' ').replace(/\s+/g, ' ').trim()).map(l => {
+    let m = l.match(/^(.+?)\s*\((M\.?|Mme|Mlle)\)(\s.*)?$/i);
+    if (m) return {name:m[1].trim(), g:/^m\.?$/i.test(m[2]) ? 'M' : 'F'};
+    m = l.match(/^(.+?)\s+[(\[]?(F|G|fille|garçon|garcon)[)\]]?$/i);
+    return m ? {name:m[1].trim(), g:/^f/i.test(m[2]) ? 'F' : 'M'} : {name:l, g:null};
+  });
+}
+function go(d) { const c = cls(), s = cur(); if (!s) return; const i = c.stu.indexOf(s) + d; if (i >= 0 && i < c.stu.length) { c.at = c.stu[i].id; render(); } }
+
+$('groups').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.act === 'settings') { openSettings(true); return; }
+  const s = cur(); if (!s || b.disabled) return;
+  const g = b.dataset.g, k = b.dataset.k, sel = s.sel;
+  if (!sel.lv) sel.lv = {};
+  if (b.classList.contains('lv')) {
+    const it = BANK[GRP[g]].find(x => x.k === k), i = lvIndex(sel, g, it) + Number(b.dataset.d);
+    if (i < 0 || i >= it.lv.length) return;
+    sel.lv[g + ':' + k] = i;
+  }
+  else if (g === 'n') sel.n = sel.n === k ? null : k;
+  else if (g === 'ac') sel.ac = k || null;
+  else {
+    const a = sel[g], i = a.indexOf(k);
+    if (i >= 0) { a.splice(i, 1); delete sel.lv[g + ':' + k]; }
+    else if (a.length >= MAX[g]) { toast(`${MAX[g]} choix au maximum ici : retires-en un d'abord.`); return; }
+    else a.push(k);
+  }
+  s.copied = false; render();
+});
+$('groups').addEventListener('input', e => {
+  if (e.target.id !== 'pn') return;
+  const s = cur(); if (!s) return;
+  const v = e.target.value.trim();
+  s.p = v && v !== prenomOf(s.name) ? v : ''; s.copied = false;
+  const rows = statuses(cls()); renderRoster(rows); renderCard(rows); save();
+});
+$('list').addEventListener('click', e => { const b = e.target.closest('.ri'); if (!b) return; cls().at = b.dataset.id; render(); });
+$('blank').addEventListener('click', e => { if (e.target.closest('[data-act=settings]')) openSettings(true); });
+$('msg').addEventListener('click', e => { const b = e.target.closest('[data-act=revert]'); if (!b) return; const s = cur(); s.manual = null; render(); });
+$('gM').addEventListener('click', () => { const s = cur(); if (s) { s.g = 'M'; s.copied = false; render(); } });
+$('gF').addEventListener('click', () => { const s = cur(); if (s) { s.g = 'F'; s.copied = false; render(); } });
+$('prev').addEventListener('click', () => go(-1));
+$('next').addEventListener('click', () => go(1));
+$('txt').addEventListener('input', e => {
+  const s = cur(); if (!s) return;
+  s.manual = e.target.value.normalize('NFC'); s.copied = false;
+  const rows = statuses(cls()); renderRoster(rows); renderCard(rows, true); save();
+});
+$('alt').addEventListener('click', () => {
+  const c = cls(), s = cur(); if (!s) return;
+  const before = compose(s, c, state.limit).text;
+  for (let i = 0; i < 40; i++) { s.seed = (s.seed || 0) + 1; if (compose(s, c, state.limit).text !== before) break; }
+  s.copied = false; render();
+});
+async function doCopy(next) {
+  const c = cls(), s = cur(); if (!s) return;
+  const t = $('txt').value;
+  if (!t.trim()) return;
+  const ok = await copyText(t);
+  if (!ok) { $('txt').select(); toast('Copie refusée par le navigateur : le texte est sélectionné, fais Ctrl+C.'); return; }
+  s.copied = true;
+  toast(`Copié : ${car(t.length)}${t.length > state.limit ? ', au-delà de la limite !' : ''}`);
+  if (next && c.stu.indexOf(s) < c.stu.length - 1) go(1); else render();
+}
+$('copy').addEventListener('click', () => doCopy(false));
+$('copyNext').addEventListener('click', () => doCopy(true));
+$('copyAll').addEventListener('click', async () => {
+  const rows = statuses(cls());
+  const t = rows.map((x, i) => `${i + 1}. ${x.s.name} : ${x.t || '(vide)'}`).join('\n');
+  toast(await copyText(t) ? `${rows.filter(x => x.t).length} appréciations copiées` : 'Copie refusée par le navigateur.');
+});
+$('clsSel').addEventListener('change', e => { state.cur = e.target.value; if (!$('settings').hidden) fillSettings(); render(); });
+$('newCls').addEventListener('click', () => {
+  const c = {id:uid(), name:'Nouvelle classe', acts:[], stu:[], at:null};
+  state.classes.push(c); state.cur = c.id; render(); openSettings(true); $('fName').select();
+});
+$('setBtn').addEventListener('click', () => openSettings());
+$('fName').addEventListener('input', e => { cls().name = e.target.value; renderTop(); save(); });
+$('fActs').addEventListener('input', e => { cls().acts = lines(e.target.value); render(); });
+$('fLimit').addEventListener('change', e => { const v = Math.round(+e.target.value); if (v >= 60 && v <= 2000) state.limit = v; e.target.value = state.limit; render(); });
+$('applyStu').addEventListener('click', () => {
+  const c = cls(), old = c.stu, used = new Set();
+  c.stu = parseList($('fStu').value).map((p, i) => {
+    const ex = old.find(s => !used.has(s.id) && s.name.toLowerCase() === p.name.toLowerCase());
+    if (ex) { used.add(ex.id); if (p.g) ex.g = p.g; return ex; }
+    return mkStu(p.name, p.g, i);
+  });
+  if (!c.stu.find(s => s.id === c.at)) c.at = c.stu[0] ? c.stu[0].id : null;
+  fillSettings(); render();
+  toast(`Liste mise à jour : ${c.stu.length} élèves`);
+});
+$('bkCopy').addEventListener('click', async () => toast(await copyText(JSON.stringify(state)) ? 'Sauvegarde copiée' : 'Copie refusée par le navigateur.'));
+function restore(txt) {
+  try { const d = JSON.parse(txt); if (!valid(d)) throw 0; d.classes.forEach(c => c.stu.forEach(s => { s.sel = migrateSel(s.sel); })); state = d; fillSettings(); render(); toast(`Sauvegarde restaurée : ${d.classes.length} classes, ${d.classes.reduce((a, c) => a + c.stu.length, 0)} élèves`); return true; }
+  catch (e) { toast('Ce n\'est pas une sauvegarde valide.'); return false; }
+}
+$('bkLoad').addEventListener('click', () => { if (restore($('bkIn').value)) $('bkIn').value = ''; });
+if (PWA) {
+  $('bkFiles').hidden = false;
+  $('bkSave').addEventListener('click', () => {
+    const a = document.createElement('a'), d = new Date();
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(state)], {type:'application/json'}));
+    a.download = `appreciations-eps-sauvegarde-${d.toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Sauvegarde enregistrée dans tes téléchargements');
+  });
+  $('bkFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => restore(String(r.result)); r.readAsText(f); e.target.value = '';
+  });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+}
+$('delCls').addEventListener('click', () => {
+  const c = cls();
+  if (!delArm) { delArm = setTimeout(() => { delArm = 0; $('delCls').textContent = 'Supprimer cette classe'; }, 5000); $('delCls').textContent = `Confirmer : supprimer ${c.name || 'la classe'} et ses appréciations`; return; }
+  clearTimeout(delArm); delArm = 0;
+  state.classes = state.classes.filter(k => k !== c);
+  if (!state.classes.length) state.classes.push({id:uid(), name:'Nouvelle classe', acts:[], stu:[], at:null});
+  state.cur = state.classes[0].id; fillSettings(); render(); toast('Classe supprimée');
+});
+
+const start = d => {
+  state = valid(d) ? d : (load() || initial()); if (!state.limit) state.limit = 255;
+  state.classes.forEach(c => c.stu.forEach(s => { s.sel = migrateSel(s.sel); }));
+  render();
+};
+try { window.claude?.hot?.snapshot?.(() => state); } catch (e) {}
+const HOT = window.claude && window.claude.hot;
+if (HOT && HOT.ready) HOT.ready(start); else start(HOT && HOT.data);
+}
+</script>
+</body>
+</html>
